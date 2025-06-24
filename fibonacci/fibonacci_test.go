@@ -13,6 +13,10 @@ func TestFibRecursiveCached(t *testing.T) {
 	FibFunctionTest(t, FibRecursiveCached)
 }
 
+func TestFibExplicitBinet(t *testing.T) {
+	FibFunctionTest(t, FibExplicitBinet)
+}
+
 func FibFunctionTest(t *testing.T, fibFunction func(int) int64) {
 	var tests = []struct {
 		n    int
@@ -40,24 +44,25 @@ func FibFunctionTest(t *testing.T, fibFunction func(int) int64) {
 }
 
 func BenchmarkFibFunctions(b *testing.B) {
-	b.Run("FibRecursive", BenchmarkFibFunction)
-	b.Run("FibRecursiveCached", BenchmarkFibFunctionRecursive)
-}
+	testFunctions := map[string](func(int) int64){
+		"FibRecursive":       FibRecursive,
+		"FibRecursiveCached": FibRecursiveCached,
+		"FibExplicitBinet":   FibExplicitBinet,
+	}
 
-func BenchmarkFibFunction(b *testing.B) {
-	FibFunctionBenchmarker(b, FibRecursive)
-}
-
-func BenchmarkFibFunctionRecursive(b *testing.B) {
-	FibFunctionBenchmarker(b, FibRecursiveCached)
+	for testName, testFunc := range testFunctions {
+		b.Run(testName, func(b *testing.B) {
+			FibFunctionBenchmarker(b, testFunc)
+		})
+	}
 }
 
 func FibFunctionBenchmarker(b *testing.B, f func(int) int64) {
-	for n := 3; n < 15; n++ {
-		testName := fmt.Sprintf("(n = %d) FibRecursive", n)
+	for n := range 20 {
+		testName := fmt.Sprintf("(n = %d)", n)
 		b.Run(testName, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				FibRecursive(n)
+				f(n)
 			}
 		})
 	}

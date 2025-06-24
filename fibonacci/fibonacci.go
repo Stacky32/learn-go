@@ -1,6 +1,9 @@
 package fibonacci
 
-import "sync"
+import (
+	"math"
+	"sync"
+)
 
 func FibRecursive(n int) int64 {
 	if n == 0 || n == 1 {
@@ -35,6 +38,7 @@ func FibRecursiveCached(n int) int64 {
 	return fibRecursiveCached(n, &cache)
 }
 
+// Slower in every case... why?
 func fibRecursiveCached(n int, c *ConcurrentCache) int64 {
 	if n == 0 || n == 1 {
 		return 1
@@ -45,4 +49,15 @@ func fibRecursiveCached(n int, c *ConcurrentCache) int64 {
 	}
 
 	return c.Set(n-1, fibRecursiveCached(n-1, c)) + c.Set(n-2, fibRecursiveCached(n-2, c))
+}
+
+func FibExplicitBinet(n int) int64 {
+	if n == 0 {
+		return 1
+	}
+
+	phi := (1 + math.Sqrt(5)) / 2
+	a := float64(n + 1)
+	fib := (math.Pow(phi, a) + math.Pow(1-phi, a)) / math.Sqrt(5)
+	return int64(math.Round(fib))
 }
