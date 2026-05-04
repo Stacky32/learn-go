@@ -56,6 +56,11 @@ func (r *CsvPriceReader) ReadAll() ([]DataPoint, error) {
 			return nil, err
 		}
 
+		item := record[adjCloseIdx]
+		if item == "" || item == "null" {
+			continue
+		}
+
 		adjClose, err := strconv.ParseFloat(record[adjCloseIdx], 32)
 		if err != nil {
 			return nil, err
